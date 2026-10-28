@@ -5,8 +5,28 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
-    environment: "jsdom",
     globals: false,
-    setupFiles: ["./vitest.setup.tsx"],
+    css: false,
+    fileParallelism: true,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: ["src/**/*.test.ts"],
+          environment: "node",
+          isolate: false,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "dom",
+          include: ["src/**/*.test.tsx"],
+          environment: "jsdom",
+          setupFiles: ["./vitest.setup.tsx"],
+        },
+      },
+    ],
   },
 });

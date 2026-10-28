@@ -1,8 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { NewsFeed } from "@/components/NewsFeed";
 import type { Article } from "@/types/news";
+
+vi.mock("@/components/CoverArt", () => ({
+  CoverArt: () => <div data-testid="cover" />,
+}));
 
 const sample: Article[] = [
   {
@@ -48,38 +51,26 @@ const sample: Article[] = [
 ];
 
 describe("NewsFeed", () => {
-  it("показує всі матеріали за замовчуванням", () => {
+  it("фільтрує за категорією і шукає за запитом", () => {
     render(<NewsFeed articles={sample} />);
+
     expect(screen.getByText("FSD оновлення для HW4")).toBeDefined();
-    expect(screen.getByText("Cybercab у Далласі")).toBeDefined();
-    expect(screen.getByText("Чип AI5 для Optimus")).toBeDefined();
-  });
 
-  it("фільтрує стрічку за категорією", async () => {
-    const user = userEvent.setup();
-    render(<NewsFeed articles={sample} />);
-
-    await user.click(screen.getByRole("button", { name: "Robotaxi" }));
-
+    fireEvent.click(screen.getByRole("button", { name: "Robotaxi" }));
     expect(screen.getByText("Cybercab у Далласі")).toBeDefined();
     expect(screen.queryByText("FSD оновлення для HW4")).toBeNull();
-    expect(screen.queryByText("Чип AI5 для Optimus")).toBeNull();
-  });
 
-  it("шукає за назвою і показує порожній стан", async () => {
-    const user = userEvent.setup();
-    render(<NewsFeed articles={sample} />);
-
-    await user.type(screen.getByRole("textbox", { name: "Пошук у стрічці" }), "AI5");
-
+    fireEvent.click(screen.getByRole("button", { name: "Усе" }));
+    const search = screen.getByRole("textbox", { name: "Пошук у стрічці" });
+    fireEvent.change(search, { target: { value: "AI5" } });
     expect(screen.getByText("Чип AI5 для Optimus")).toBeDefined();
     expect(screen.queryByText("Cybercab у Далласі")).toBeNull();
 
-    await user.clear(screen.getByRole("textbox", { name: "Пошук у стрічці" }));
-    await user.type(screen.getByRole("textbox", { name: "Пошук у стрічці" }), "zzz");
-
+    fireEvent.change(search, { target: { value: "zzz" } });
     expect(
-      screen.getByText("У цій смузі сигналу порожньо. Зніміть фільтр або змініть запит."),
+      screen.getByText(
+        "У цій смузі сигналу порожньо. Зніміть фільтр або змініть запит.",
+      ),
     ).toBeDefined();
   });
 });

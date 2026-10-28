@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { articles } from "@/data/news";
 import {
+  filterArticles,
   formatDate,
   formatShortDate,
   getArticle,
@@ -13,16 +15,21 @@ describe("getArticles", () => {
   it("повертає матеріали від новіших до старіших", () => {
     const dates = getArticles().map((article) => article.publishedAt);
     const sorted = [...dates].sort(
-      (a, b) => new Date(b).getTime() - new Date(a).getTime(),
+      (a, b) => Date.parse(b) - Date.parse(a),
     );
     expect(dates).toEqual(sorted);
+  });
+
+  it("не копіює масив на кожен виклик", () => {
+    expect(getArticles()).toBe(getArticles());
   });
 });
 
 describe("getFeaturedArticle", () => {
   it("повертає статтю з позначкою featured", () => {
-    expect(getFeaturedArticle().featured).toBe(true);
-    expect(getFeaturedArticle().slug).toBe("fsd-14-3-mlir");
+    const featured = getFeaturedArticle();
+    expect(featured.featured).toBe(true);
+    expect(featured.slug).toBe("fsd-14-3-mlir");
   });
 });
 
@@ -48,6 +55,31 @@ describe("getRelated", () => {
   it("спочатку ставить матеріали тієї ж категорії", () => {
     const related = getRelated("fsd-14-3-mlir", 2);
     expect(related[0]?.category).toBe("fsd");
+  });
+});
+
+describe("filterArticles", () => {
+  it("за категорією лишає лише robotaxi", () => {
+    const filtered = filterArticles(articles, { category: "robotaxi" });
+    expect(filtered.length).toBeGreaterThan(0);
+    expect(filtered.every((article) => article.category === "robotaxi")).toBe(
+      true,
+    );
+  });
+
+  it("шукає за назвою, залізом і версією", () => {
+    expect(filterArticles(articles, { query: "AI5" }).map((a) => a.slug)).toContain(
+      "ai5-chip",
+    );
+    expect(
+      filterArticles(articles, { query: "2026.38.5" }).every((article) =>
+        article.version?.includes("2026.38.5"),
+      ),
+    ).toBe(true);
+  });
+
+  it("повертає той самий масив, якщо фільтр порожній", () => {
+    expect(filterArticles(articles)).toBe(articles);
   });
 });
 

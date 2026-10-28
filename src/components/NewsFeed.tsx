@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { NewsCard } from "@/components/NewsCard";
 import { categories } from "@/data/news";
+import { filterArticles } from "@/lib/news";
 import type { Article, CategoryId } from "@/types/news";
 
 type Filter = "all" | CategoryId;
@@ -11,19 +12,10 @@ export function NewsFeed({ articles }: { articles: Article[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
 
-  const visible = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return articles.filter((article) => {
-      const byCategory = filter === "all" || article.category === filter;
-      const byQuery =
-        needle.length === 0 ||
-        article.title.toLowerCase().includes(needle) ||
-        article.excerpt.toLowerCase().includes(needle) ||
-        article.hardware.toLowerCase().includes(needle) ||
-        (article.version ?? "").toLowerCase().includes(needle);
-      return byCategory && byQuery;
-    });
-  }, [articles, filter, query]);
+  const visible = useMemo(
+    () => filterArticles(articles, { category: filter, query }),
+    [articles, filter, query],
+  );
 
   return (
     <section className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">

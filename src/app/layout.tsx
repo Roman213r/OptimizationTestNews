@@ -7,17 +7,23 @@ import "./globals.css";
 const unbounded = Unbounded({
   variable: "--font-unbounded",
   subsets: ["latin", "cyrillic"],
+  display: "swap",
+  preload: true,
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin", "cyrillic"],
+  display: "swap",
+  preload: true,
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm",
-  weight: ["400", "500"],
+  weight: "400",
   subsets: ["latin", "cyrillic"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

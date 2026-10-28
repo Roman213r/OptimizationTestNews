@@ -45,6 +45,13 @@ async function ArticleContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  if (!getArticle(slug)) notFound();
+  return <CachedArticle slug={slug} />;
+}
+
+async function CachedArticle({ slug }: { slug: string }) {
+  "use cache";
+
   const article = getArticle(slug);
   if (!article) notFound();
 

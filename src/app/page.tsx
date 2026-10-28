@@ -4,7 +4,9 @@ import { SignalStats } from "@/components/SignalStats";
 import { Ticker } from "@/components/Ticker";
 import { getArticles, getFeaturedArticle } from "@/lib/news";
 
-export default function Home() {
+export default async function Home() {
+  "use cache";
+
   const articles = getArticles();
   const featured = getFeaturedArticle();
   const rest = articles.filter((article) => article.slug !== featured.slug);

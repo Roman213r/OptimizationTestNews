@@ -141,14 +141,14 @@ export function CoverArt({
 
   return (
     <div
-      className={`cover-art relative overflow-hidden ${height} ${className}`}
+      className={`cover-art relative overflow-hidden ${size === "hero" ? "" : "cover-art-deferred"} ${height} ${className}`}
     >
       <div
         className={`absolute inset-0 bg-linear-to-br ${categoryTone[article.category]}`}
       />
       <div className="absolute inset-0 opacity-40 mix-blend-overlay [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px] [transform:perspective(400px)_rotateX(62deg)_scale(1.8)_translateY(-20%)]" />
       <div className="absolute -right-10 -bottom-16 text-white/25">
-        <svg viewBox="0 0 64 64" className="h-56 w-56">
+        <svg viewBox="0 0 64 64" className="h-56 w-56" aria-hidden>
           <MotifMark motif={article.motif} />
         </svg>
       </div>
